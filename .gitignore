@@ -1,0 +1,11 @@
+build
+node_modules
+package-lock.json
+yarn.lock
+keystore.json
+.secret
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride

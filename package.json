@@ -1,0 +1,26 @@
+{
+  "name": "contract-fund",
+  "version": "1.0.0",
+  "description": "CyclingFund Contract",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "openzeppelin-solidity": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CyclingDAO/contract-fund.git"
+  },
+  "author": "outprog",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CyclingDAO/contract-fund/issues"
+  },
+  "homepage": "https://github.com/CyclingDAO/contract-fund#readme"
+}
