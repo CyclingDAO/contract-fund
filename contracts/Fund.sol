@@ -47,28 +47,40 @@ contract Fund is
     // Reward Variable
     uint256 public totalReward;
     uint256 public usedReward;
-    // End of Variable
+    // End of Reward Variable
     /////////////////////////
 
     /////////////////////////
     // Events
-    // TODO
+    event RegisterMember(string name, address member);
+    event DeregisterMember(address member);
+    event StartActivity(uint256 id, uint256 reward);
+    event AdditionalReward(uint256 id, uint256 addReward);
+    event AddKm(uint256 id, address member, uint256 addKm);
+    event SubKm(uint256 id, address member, uint256 subKm);
+    event StartClaim();
+    event Claim(uint256 id, address member, uint256 activityKm, uint256 reward);
+    event EndActivity(uint256 surplus);
     // End of Events
     /////////////////////////
 
     /////////////////////////
     // Member Manage 
-    function registerMember(string memory _name, address _memberAddr) public onlyOwner {
-        members[_memberAddr] = Member({
+    function registerMember(string memory _name, address _member) public onlyOwner {
+        members[_member] = Member({
             name: _name,
             usedKm: 0,
             activityKm: 0,
             updatedActivityID: 0});
-        isMember[_memberAddr] = true;
+        isMember[_member] = true;
+
+        emit RegisterMember(_name, _member);
     }
 
-    function deregisterMember(address _memberAddr) public onlyOwner {
-        isMember[_memberAddr] = false;
+    function deregisterMember(address _member) public onlyOwner {
+        isMember[_member] = false;
+
+        emit DeregisterMember(_member);
     }
     // End of Member Manage
     /////////////////////////
@@ -92,6 +104,8 @@ contract Fund is
 
         totalReward = msg.value;
         usedReward = 0;
+
+        emit StartActivity(activityID, totalReward);
     }
 
     // Send more ETH to Fund Conctact be activity reward
@@ -102,6 +116,8 @@ contract Fund is
         );
 
         totalReward = SafeMath.add(totalReward, msg.value);
+
+        emit AdditionalReward(activityID, msg.value);
     }
 
     function addKm(address[] memory _members, uint256[] memory _kms) public onlyOwner{
@@ -128,6 +144,8 @@ contract Fund is
             members[_members[i]].updatedActivityID = activityID;
 
             activityTotalKm = SafeMath.add(activityTotalKm, _kms[i]);
+
+            emit AddKm(activityID, _members[i], _kms[i]);
         }
     }
 
@@ -160,6 +178,8 @@ contract Fund is
             members[_members[i]].updatedActivityID = activityID;
 
             activityTotalKm = SafeMath.sub(activityTotalKm, _kms[i]);
+
+            emit SubKm(activityID, _members[i], _kms[i]);
         }
     }
 
@@ -170,6 +190,8 @@ contract Fund is
         );
 
         activityStatus = ActivityStatus.CLAIM;
+
+        emit StartClaim();
     }
 
     function claim() public {
@@ -188,26 +210,34 @@ contract Fund is
             "ACTIVITYID_NOT_EQUAL"
         );
 
+        uint256 activityKm = members[msg.sender].activityKm;
+        members[msg.sender].activityKm = 0;
+
         uint256 value = SafeMath.div(
             SafeMath.mul(
                 totalReward,
-                members[msg.sender].activityKm),
+                activityKm),
             activityTotalKm
         );
 
         members[msg.sender].usedKm = SafeMath.add(
             members[msg.sender].usedKm,
-            members[msg.sender].activityKm
+            activityKm
         );
-        members[msg.sender].activityKm = 0;
 
         usedReward = SafeMath.add(usedReward, value);
         msg.sender.transfer(value);
+
+        emit Claim(activityID, msg.sender, activityKm, value);
     }
 
     function endActivity() public onlyOwner {
         activityStatus = ActivityStatus.END;
-        msg.sender.transfer(address(this).balance);
+
+        uint256 value = address(this).balance;
+        msg.sender.transfer(value);
+
+        emit EndActivity(value);
     }
     // End of Organize Activity
     /////////////////////////
