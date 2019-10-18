@@ -1,4 +1,4 @@
-#CyclingDAO 白皮书
+# CyclingDAO 白皮书
 
 - 建立 CyclingFund 智能合约基金
 - CyclingDAO identity（作为俱乐部通证身份）
