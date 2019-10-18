@@ -40,6 +40,8 @@ contract Fund is
     uint256 public activityID;
     uint256 public activityTotalKm;
     ActivityStatus public activityStatus;
+
+    mapping(uint256=>bool) private isUsedActivityID;
     // End of Activity Variable
     /////////////////////////
 
@@ -98,12 +100,19 @@ contract Fund is
             "ACTIVITY_NOT_END"
         );
 
+        require(
+            !isUsedActivityID[_id],
+            "USED_ACTIVITYID"
+        );
+
         activityID = _id;
         activityTotalKm = 0;
         activityStatus = ActivityStatus.START;
 
         totalReward = msg.value;
         usedReward = 0;
+
+        isUsedActivityID[activityID] = true;
 
         emit StartActivity(activityID, totalReward);
     }
