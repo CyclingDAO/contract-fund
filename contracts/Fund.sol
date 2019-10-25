@@ -4,7 +4,7 @@ import "../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 // Fund for Cycling Activity reward
-contract Fund is 
+contract Fund is
     Ownable
 {
     /////////////////////////
@@ -37,6 +37,7 @@ contract Fund is
         CLAIM
     }
 
+    uint256 public totalKm;
     uint256 public activityID;
     uint256 public activityTotalKm;
     ActivityStatus public activityStatus;
@@ -67,7 +68,7 @@ contract Fund is
     /////////////////////////
 
     /////////////////////////
-    // Member Manage 
+    // Member Manage
     function registerMember(string memory _name, address _member) public onlyOwner {
         members[_member] = Member({
             name: _name,
@@ -94,7 +95,7 @@ contract Fund is
         start(owner) ->  update Km(owner, add or sub) -> startClaim(owner)
         -> claim(member) -> end(owner)
     */
-    function startActivity(uint256 _id) payable public onlyOwner {
+    function startActivity(uint256 _id) public payable onlyOwner {
         require(
             activityStatus == ActivityStatus.END,
             "ACTIVITY_NOT_END"
@@ -106,11 +107,9 @@ contract Fund is
         );
 
         activityID = _id;
-        activityTotalKm = 0;
         activityStatus = ActivityStatus.START;
 
         totalReward = msg.value;
-        usedReward = 0;
 
         isUsedActivityID[activityID] = true;
 
@@ -146,12 +145,15 @@ contract Fund is
                 "NOT_MEMBER"
             );
 
+            if(members[_members[i]].updatedActivityID != activityID) {
+              members[_members[i]].activityKm = 0;
+              members[_members[i]].updatedActivityID = activityID;
+            }
+
             members[_members[i]].activityKm = SafeMath.add(
                 members[_members[i]].activityKm,
                 _kms[i]); 
  
-            members[_members[i]].updatedActivityID = activityID;
-
             activityTotalKm = SafeMath.add(activityTotalKm, _kms[i]);
 
             emit AddKm(activityID, _members[i], _kms[i]);
@@ -180,11 +182,14 @@ contract Fund is
                 "KM_MORE_THEN_ACTIVITYKM"
             );
 
+            if(members[_members[i]].updatedActivityID != activityID) {
+              members[_members[i]].activityKm = 0;
+              members[_members[i]].updatedActivityID = activityID;
+            }
+
             members[_members[i]].activityKm = SafeMath.sub(
                 members[_members[i]].activityKm,
                 _kms[i]);
-
-            members[_members[i]].updatedActivityID = activityID;
 
             activityTotalKm = SafeMath.sub(activityTotalKm, _kms[i]);
 
@@ -234,6 +239,8 @@ contract Fund is
             activityKm
         );
 
+        totalKm = SafeMath.add(totalKm, activityKm);
+
         usedReward = SafeMath.add(usedReward, value);
         msg.sender.transfer(value);
 
@@ -242,6 +249,10 @@ contract Fund is
 
     function endActivity() public onlyOwner {
         activityStatus = ActivityStatus.END;
+
+        activityTotalKm = 0;
+        totalReward = 0;
+        usedReward = 0;
 
         uint256 value = address(this).balance;
         msg.sender.transfer(value);

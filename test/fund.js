@@ -112,6 +112,8 @@ contract("Fund", ([owner, member1, member2, member3]) => {
 
         balanceOfFund = await web3.eth.getBalance(fund.address)
         assert.equal(1, balanceOfFund) // precision problem
+
+        assert.equal(109, await fund.totalKm())
     });
 
     it("should end activity", async () => {
@@ -128,5 +130,9 @@ contract("Fund", ([owner, member1, member2, member3]) => {
 
         balanceOfFund = await web3.eth.getBalance(fund.address)
         assert.equal(0, balanceOfFund)
+
+        assert.equal(0, await fund.activityTotalKm())
+        assert.equal(0, await fund.totalReward())
+        assert.equal(0, await fund.usedReward())
     });
 })
