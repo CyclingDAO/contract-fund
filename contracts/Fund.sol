@@ -56,7 +56,7 @@ contract Fund is
 
     /////////////////////////
     // Events
-    event RegisterMember(string name, address member);
+    event RegisterMember(address member, string name);
     event DeregisterMember(address member);
     event StartActivity(uint256 id, uint256 reward);
     event AdditionalReward(uint256 id, uint256 addReward);
@@ -70,7 +70,7 @@ contract Fund is
 
     /////////////////////////
     // Member Manage
-    function registerMember(address[] memory _members, string[] memory _names) public onlyOwner {
+    function registerMembers(address[] memory _members, string[] memory _names) public onlyOwner {
       require(
         _members.length == _names.length,
         "REGISTER_LENGTH_NOT_EQUAL"
@@ -84,11 +84,11 @@ contract Fund is
           updatedActivityID: 0});
         isMember[_members[i]] = true;
 
-        emit RegisterMember(_names[i], _members[i]);
+        emit RegisterMember(_members[i], _names[i]);
       }
     }
 
-    function deregisterMember(address[] memory _members) public onlyOwner {
+    function deregisterMembers(address[] memory _members) public onlyOwner {
       for(uint i = 0; i < _members.length; i++) {
         isMember[_members[i]] = false;
 
@@ -257,9 +257,11 @@ contract Fund is
       emit Claim(activityID, msg.sender, activityKm, value);
     }
 
+    // endActivity whatever activity status
     function endActivity() public onlyOwner {
       activityStatus = ActivityStatus.END;
 
+      activityID = 0;
       activityTotalKm = 0;
       totalReward = 0;
       usedReward = 0;

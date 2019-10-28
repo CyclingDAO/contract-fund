@@ -15,14 +15,14 @@ contract("Fund", ([owner, member1, member2, member3]) => {
 
     assert.equal(await fund.isMember(member1), false)
 
-    await fund.registerMember([member1], [member1Name])
+    await fund.registerMembers([member1], [member1Name])
 
     m = await fund.members(member1)
     assert.equal(member1Name, m.name)
     assert.equal(true, await fund.isMember(member1))
 
     // deregister member
-    await fund.deregisterMember([member1])
+    await fund.deregisterMembers([member1])
 
     assert.equal(false, await fund.isMember(member1))
   });
@@ -51,7 +51,7 @@ contract("Fund", ([owner, member1, member2, member3]) => {
 
   it("should update km", async () => {
     fund = await Fund.new();
-    await fund.registerMember([member1, member2], [member1Name, member2Name])
+    await fund.registerMembers([member1, member2], [member1Name, member2Name])
     await fund.startActivity(activityID)
 
     m1 = await fund.members(member1)
@@ -89,7 +89,7 @@ contract("Fund", ([owner, member1, member2, member3]) => {
 
   it("should claim success", async () => {
     fund = await Fund.new();
-    await fund.registerMember(
+    await fund.registerMembers(
       [member1, member2, member3],
       [member1Name, member2Name, member3Name])
     await fund.startActivity(activityID, {
