@@ -5,7 +5,9 @@ module.exports = () => {
 
     const fund = await artifacts.require('Fund').deployed();
 
-    await fund.startActivity(201911);
+    await fund.startActivity(params.activityID, {
+      value: web3.utils.toWei(params.reward, 'ether'),
+    });
   }
 
   run().then(() => {

@@ -5,7 +5,7 @@ module.exports = () => {
 
     const fund = await artifacts.require('Fund').deployed();
 
-    await fund.addKm(params.memberAddrs, [700,100,200]);
+    await fund.addKm(params.memberAddrs, params.kms);
   }
 
   run().then(() => {
