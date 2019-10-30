@@ -1,7 +1,7 @@
 const kovan = {
   network: "kovan",
-  activityID: 20191109,
-  reward: '0.1', // ETH
+  activityID: 201911,
+  reward: '1', // ETH
   kms: [5910, 66, 1092, 1170, 112, 122, 1],
   memberAddrs: [
     "0xDc19464589c1cfdD10AEdcC1d09336622b282652", // outprog

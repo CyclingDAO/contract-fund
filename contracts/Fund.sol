@@ -79,6 +79,11 @@ contract Fund is
       );
 
       for(uint i = 0; i < _members.length; i++) {
+        require(
+          !isMember[_members[i]],
+          "MEMBER_REGISTERED"
+        );
+
         members[_members[i]] = Member({
           name: _names[i],
           usedKm: 0,
