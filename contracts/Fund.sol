@@ -15,6 +15,7 @@ contract Fund is
       usedKm:             when member claim, usedKm add activityKm
       activityKm:         activityKm for claim, just valid current activity
       updatedActivityID:  last km updated activityID
+      isClaimed:            is current activity claimed?
 
       * if no claim and activity over, activityKm invalid
     */
@@ -23,6 +24,7 @@ contract Fund is
       uint256 usedKm;
       uint256 activityKm;
       uint256 updatedActivityID;
+      bool isClaimed;
     }
 
     mapping(address=>Member) public members;
@@ -81,7 +83,8 @@ contract Fund is
           name: _names[i],
           usedKm: 0,
           activityKm: 0,
-          updatedActivityID: 0});
+          updatedActivityID: 0,
+          isClaimed: false});
         isMember[_members[i]] = true;
 
         emit RegisterMember(_members[i], _names[i]);
@@ -158,6 +161,7 @@ contract Fund is
         if(members[_members[i]].updatedActivityID != activityID) {
           members[_members[i]].activityKm = 0;
           members[_members[i]].updatedActivityID = activityID;
+          members[_members[i]].isClaimed = false;
         }
 
         members[_members[i]].activityKm = SafeMath.add(
@@ -188,14 +192,14 @@ contract Fund is
         );
 
         require(
+          members[_members[i]].updatedActivityID == activityID,
+          "NO_KM_UPDATE"
+        );
+
+        require(
           members[_members[i]].activityKm > _kms[i],
           "KM_MORE_THEN_ACTIVITYKM"
         );
-
-        if(members[_members[i]].updatedActivityID != activityID) {
-          members[_members[i]].activityKm = 0;
-          members[_members[i]].updatedActivityID = activityID;
-        }
 
         members[_members[i]].activityKm = SafeMath.sub(
           members[_members[i]].activityKm,
@@ -234,27 +238,29 @@ contract Fund is
         "ACTIVITYID_NOT_EQUAL"
       );
 
-      uint256 activityKm = members[msg.sender].activityKm;
-      members[msg.sender].activityKm = 0;
+      require(
+        !members[msg.sender].isClaimed,
+        "MEMBER_CLAIMED"
+      );
+
+      members[msg.sender].isClaimed = true;
+      members[msg.sender].usedKm = SafeMath.add(
+        members[msg.sender].usedKm,
+        members[msg.sender].activityKm
+      );
+      totalKm = SafeMath.add(totalKm, members[msg.sender].activityKm);
 
       uint256 value = SafeMath.div(
         SafeMath.mul(
           totalReward,
-          activityKm),
+          members[msg.sender].activityKm),
         activityTotalKm
       );
-
-      members[msg.sender].usedKm = SafeMath.add(
-        members[msg.sender].usedKm,
-        activityKm
-      );
-
-      totalKm = SafeMath.add(totalKm, activityKm);
 
       usedReward = SafeMath.add(usedReward, value);
       msg.sender.transfer(value);
 
-      emit Claim(activityID, msg.sender, activityKm, value);
+      emit Claim(activityID, msg.sender, members[msg.sender].activityKm, value);
     }
 
     // endActivity whatever activity status

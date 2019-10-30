@@ -96,6 +96,10 @@ contract("Fund", ([owner, member1, member2, member3]) => {
       value: web3.utils.toWei('10', 'ether'),
     })
     await fund.addKm([member1, member2, member3], [member1Km, member2Km, member3Km])
+
+    m1 = await fund.members(member1);
+    assert.equal(false, m1.isClaimed)
+
     await fund.startClaim()
 
     await fund.claim({ from: member1 })
@@ -108,6 +112,8 @@ contract("Fund", ([owner, member1, member2, member3]) => {
     // console.log("balanceOfMember2", balanceOfMember2)
     // balanceOfMember3 = await web3.eth.getBalance(member3)
     // console.log("balanceOfMember3", balanceOfMember3)
+    m1 = await fund.members(member1);
+    assert.equal(true, m1.isClaimed)
 
     balanceOfFund = await web3.eth.getBalance(fund.address)
     assert.equal(1, balanceOfFund) // precision problem
