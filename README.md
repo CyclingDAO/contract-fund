@@ -10,7 +10,7 @@ CyclingFund: TBD
 
 ### Kovan
 
-CyclingFund: [0xfA636f22a75b5bAffbE4EE9D00674981511A618d](https://etherscan.io/address/0xfA636f22a75b5bAffbE4EE9D00674981511A618d)
+CyclingFund: [0xE3c02E78BbD3CDc7A2850bB19721f3D8D2aE48Ce](https://kovan.etherscan.io/address/0xE3c02E78BbD3CDc7A2850bB19721f3D8D2aE48Ce)
 
 ## Development
 
