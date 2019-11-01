@@ -10,21 +10,34 @@ contract("Fund", ([owner, member1, member2, member3]) => {
   const member3Km = 0
   const activityID = 201910
 
-  it("should register memaber success", async () => {
+  it("should manage memaber success", async () => {
     fund = await Fund.new();
 
     assert.equal(await fund.isMember(member1), false)
 
+    // reigster
     await fund.registerMembers([member1], [member1Name])
 
     m = await fund.members(member1)
     assert.equal(member1Name, m.name)
     assert.equal(true, await fund.isMember(member1))
 
-    // deregister member
-    await fund.deregisterMembers([member1])
+    // setName
+    await fund.setName("changed", {from: member1})
+
+    m = await fund.members(member1)
+    assert.equal("changed", m.name)
+
+    // SetAddress
+    await fund.setAddress(member2, {from: member1})
 
     assert.equal(false, await fund.isMember(member1))
+    assert.equal(true, await fund.isMember(member2))
+
+    // deregister
+    await fund.deregisterMembers([member2])
+
+    assert.equal(false, await fund.isMember(member2))
   });
 
   it("should start activity", async () => {

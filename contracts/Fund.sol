@@ -60,6 +60,8 @@ contract Fund is
   // Events
   event RegisterMember(address member, string name);
   event DeregisterMember(address member);
+  event SetName(address member, string name);
+  event SetAddress(address oldAddress,  address newAddress);
   event StartActivity(uint256 id, uint256 reward);
   event AdditionalReward(uint256 id, uint256 addReward);
   event AddKm(uint256 id, address member, uint256 addKm);
@@ -72,6 +74,14 @@ contract Fund is
 
   /////////////////////////
   // Member Manage
+  modifier onlyMember() {
+    require(
+      isMember[msg.sender],
+      "NOT_MEMBER"
+    );
+    _;
+  }
+
   function registerMembers(address[] memory _members, string[] memory _names) public onlyOwner {
     require(
       _members.length == _names.length,
@@ -102,6 +112,25 @@ contract Fund is
 
       emit DeregisterMember(_members[i]);
     }
+  }
+
+  function setName(string memory _name) public onlyMember {
+    members[msg.sender].name = _name;
+
+    emit SetName(msg.sender, _name);
+  }
+
+  function setAddress(address _newAddress) public onlyMember {
+    require(
+      !isMember[_newAddress],
+      "MEMBER_REGISTERED"
+    );
+
+    members[_newAddress] = members[msg.sender];
+    isMember[_newAddress] = true;
+    isMember[msg.sender] = false;
+
+    emit SetAddress(msg.sender, _newAddress);
   }
   // End of Member Manage
   /////////////////////////
@@ -227,15 +256,10 @@ contract Fund is
     emit StartClaim();
   }
 
-  function claim() public {
+  function claim() public onlyMember {
     require(
       activityStatus == ActivityStatus.CLAIM,
       "ACTIVITY_NOT_CLAIM"
-    );
-
-    require(
-      isMember[msg.sender],
-      "NOT_MEMBER"
     );
 
     require(
@@ -245,7 +269,7 @@ contract Fund is
 
     require(
       !members[msg.sender].isClaimed,
-      "MEMBER_CLAIMED"
+      "IS_CLAIMED"
     );
 
     members[msg.sender].isClaimed = true;
