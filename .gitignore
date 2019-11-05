@@ -4,6 +4,7 @@ package-lock.json
 yarn.lock
 keystore.json
 .secret
+.secret.bk
 
 ### macOS ###
 *.DS_Store

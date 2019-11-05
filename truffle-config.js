@@ -7,6 +7,7 @@ const fs = require('fs');
 const prvKey = fs.readFileSync(".secret").toString().trim();
 
 const kovanProvider = new HDWalletProvider(prvKey, `https://kovan.infura.io/`)
+const mainnetProvider = new HDWalletProvider(prvKey, `https://mainnet.infura.io/v3/92bbc76799c64b1398c2f2222bd7bf7d`)
 
 module.exports = {
   /**
@@ -21,6 +22,13 @@ module.exports = {
 
 
   networks: {
+    mainnet: {
+      provider: mainnetProvider,
+      network_id: '1',
+      gas: 5000000,
+      gasPrice: web3.utils.toWei('10.1', 'gwei'),
+      skipDryRun: true,
+    },
     kovan: {
       provider: kovanProvider,
       network_id: '42',
