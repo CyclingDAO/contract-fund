@@ -1,11 +1,8 @@
 pragma solidity ^0.5.0;
 
-import "./ICyclingData.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract CyclingData is
-  ICyclingData
-{
+contract CyclingData {
   address public cyclingDAO;
 
   uint256 public totalKm;

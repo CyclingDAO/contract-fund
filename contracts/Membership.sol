@@ -1,9 +1,11 @@
 pragma solidity ^0.5.0;
 
+import "./IMembership.sol";
 import "./CyclingData.sol";
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract Membership is
+  IMembership,
   Ownable,
   CyclingData(address(0))
 {

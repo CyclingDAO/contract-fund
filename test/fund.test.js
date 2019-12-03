@@ -13,31 +13,15 @@ contract("Fund", ([owner, member1, member2, member3]) => {
   it("should manage memaber success", async () => {
     fund = await Fund.new();
 
-    assert.equal(await fund.isMember(member1), false)
+    assert.equal(await fund.isMember(member1), false, "member1 should not member")
 
     // reigster
-    await fund.registerMembers([member1], [member1Name])
-
-    m = await fund.members(member1)
-    assert.equal(member1Name, m.name)
-    assert.equal(true, await fund.isMember(member1))
-
-    // setName
-    await fund.setName("changed", {from: member1})
-
-    m = await fund.members(member1)
-    assert.equal("changed", m.name)
-
-    // SetAddress
-    await fund.setAddress(member2, {from: member1})
-
-    assert.equal(false, await fund.isMember(member1))
-    assert.equal(true, await fund.isMember(member2))
+    await fund.registerMembers([member1])
+    assert.equal(true, await fund.isMember(member1), "member1 should member")
 
     // deregister
-    await fund.deregisterMembers([member2])
-
-    assert.equal(false, await fund.isMember(member2))
+    await fund.deregisterMembers([member1])
+    assert.equal(false, await fund.isMember(member1), "member1 should not member")
   });
 
   it("should start activity", async () => {
@@ -62,35 +46,35 @@ contract("Fund", ([owner, member1, member2, member3]) => {
     assert.equal(web3.utils.toWei('0.3', 'ether'), await fund.totalReward())
   });
 
-  it("should update km", async () => {
-    fund = await Fund.new();
-    await fund.registerMembers([member1, member2], [member1Name, member2Name])
-    await fund.startActivity(activityID)
+  // it("should update km", async () => {
+  //   fund = await Fund.new();
+  //   await fund.registerMembers([member1, member2], [member1Name, member2Name])
+  //   await fund.startActivity(activityID)
 
-    m1 = await fund.members(member1)
-    assert.equal(0, m1.updatedActivityID)
-    assert.equal(0, m1.activityKm)
+  //   m1 = await fund.members(member1)
+  //   assert.equal(0, m1.updatedActivityID)
+  //   assert.equal(0, m1.activityKm)
 
-    await fund.addKm([member1, member2], [member1Km, member2Km])
+  //   await fund.addKm([member1, member2], [member1Km, member2Km])
 
-    m1 = await fund.members(member1)
-    assert.equal(activityID, m1.updatedActivityID)
-    assert.equal(member1Km, m1.activityKm)
+  //   m1 = await fund.members(member1)
+  //   assert.equal(activityID, m1.updatedActivityID)
+  //   assert.equal(member1Km, m1.activityKm)
 
-    m2 = await fund.members(member2)
-    assert.equal(activityID, m2.updatedActivityID)
-    assert.equal(member2Km, m2.activityKm)
+  //   m2 = await fund.members(member2)
+  //   assert.equal(activityID, m2.updatedActivityID)
+  //   assert.equal(member2Km, m2.activityKm)
 
-    assert.equal(member1Km + member2Km, await fund.activityTotalKm())
+  //   assert.equal(member1Km + member2Km, await fund.activityTotalKm())
 
-    // sub km
-    await fund.subKm([member2], [member2KmSub])
+  //   // sub km
+  //   await fund.subKm([member2], [member2KmSub])
 
-    m2 = await fund.members(member2)
-    assert.equal(member2Km - member2KmSub, m2.activityKm)
+  //   m2 = await fund.members(member2)
+  //   assert.equal(member2Km - member2KmSub, m2.activityKm)
 
-    assert.equal(member1Km + member2Km - member2KmSub, await fund.activityTotalKm())
-  });
+  //   assert.equal(member1Km + member2Km - member2KmSub, await fund.activityTotalKm())
+  // });
 
   it("should to be claim status", async () => {
     fund = await Fund.new();
@@ -100,39 +84,39 @@ contract("Fund", ([owner, member1, member2, member3]) => {
     assert.equal(2, await fund.activityStatus())
   });
 
-  it("should claim success", async () => {
-    fund = await Fund.new();
-    await fund.registerMembers(
-      [member1, member2, member3],
-      [member1Name, member2Name, member3Name])
-    await fund.startActivity(activityID, {
-      value: web3.utils.toWei('10', 'ether'),
-    })
-    await fund.addKm([member1, member2, member3], [member1Km, member2Km, member3Km])
+  // it("should claim success", async () => {
+  //   fund = await Fund.new();
+  //   await fund.registerMembers(
+  //     [member1, member2, member3],
+  //     [member1Name, member2Name, member3Name])
+  //   await fund.startActivity(activityID, {
+  //     value: web3.utils.toWei('10', 'ether'),
+  //   })
+  //   await fund.addKm([member1, member2, member3], [member1Km, member2Km, member3Km])
 
-    m1 = await fund.members(member1);
-    assert.equal(false, m1.isClaimed)
+  //   m1 = await fund.members(member1);
+  //   assert.equal(false, m1.isClaimed)
 
-    await fund.startClaim()
+  //   await fund.startClaim()
 
-    await fund.claim({ from: member1 })
-    await fund.claim({ from: member2 })
-    await fund.claim({ from: member3 })
+  //   await fund.claim({ from: member1 })
+  //   await fund.claim({ from: member2 })
+  //   await fund.claim({ from: member3 })
 
-    // balanceOfMember1 = await web3.eth.getBalance(member1)
-    // console.log("balanceOfMember1", balanceOfMember1)
-    // balanceOfMember2 = await web3.eth.getBalance(member2)
-    // console.log("balanceOfMember2", balanceOfMember2)
-    // balanceOfMember3 = await web3.eth.getBalance(member3)
-    // console.log("balanceOfMember3", balanceOfMember3)
-    m1 = await fund.members(member1);
-    assert.equal(true, m1.isClaimed)
+  //   // balanceOfMember1 = await web3.eth.getBalance(member1)
+  //   // console.log("balanceOfMember1", balanceOfMember1)
+  //   // balanceOfMember2 = await web3.eth.getBalance(member2)
+  //   // console.log("balanceOfMember2", balanceOfMember2)
+  //   // balanceOfMember3 = await web3.eth.getBalance(member3)
+  //   // console.log("balanceOfMember3", balanceOfMember3)
+  //   m1 = await fund.members(member1);
+  //   assert.equal(true, m1.isClaimed)
 
-    balanceOfFund = await web3.eth.getBalance(fund.address)
-    assert.equal(1, balanceOfFund) // precision problem
+  //   balanceOfFund = await web3.eth.getBalance(fund.address)
+  //   assert.equal(1, balanceOfFund) // precision problem
 
-    assert.equal(109, await fund.totalKm())
-  });
+  //   assert.equal(109, await fund.totalKm())
+  // });
 
   it("should end activity", async () => {
     fund = await Fund.new();

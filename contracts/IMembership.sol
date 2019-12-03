@@ -1,6 +1,9 @@
 pragma solidity ^0.5.0;
 
-interface ICyclingData {
+interface IMembership {
+  function owner() external view returns (address);
+  function transferCyclingDAO(address _newDAO) external;
+
   function currentActivityID() external view returns(uint256);
   function currentActivityKm() external view returns(uint256);
   function currentActivityIsClaimed() external view returns(bool);
